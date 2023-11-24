@@ -1,4 +1,5 @@
 import os
+import shutil
 
 
 def remove_digits(string):
@@ -32,3 +33,12 @@ def display_names(table_names_presidents):
         if names not in new_list:
             new_list.append(names)
     print(new_list)
+
+
+def cleaned(directory, extension):
+    name_file = "cleaned"
+    os.mkdir(name_file)
+    shutil.move(directory, name_file)
+
+
+

@@ -4,14 +4,10 @@ from api import utils
 
 
 def list_of_files(directory, extension):
-    files_names = []
-    for filename in os.listdir(directory):
-        if filename.endswith(extension):
-            files_names.append(filename)
-    return files_names
+    utils.create_table_files_directory(directory, extension)
 
 
-def dict_names(): #faire un arg avec table files speeches
+def dict_names():  # faire un arg avec table files speeches
     noms = {"Jacques": "Nomination_Chirac1.txt", "Jacques ": "Nomination_Chirac2.txt",
             "Valéry": "Nomination_Giscard dEstaing.txt", "François": "Nomination_Hollande.txt",
             "Emmanuel": "Nomination_Macron.txt", "François ": "Nomination_Mitterrand1.txt",
@@ -42,3 +38,10 @@ def cleaned(directory):
                 content_lower = content.lower()
                 with open(file_path, 'w') as cleaned_file:
                     cleaned_file.write(content_lower)
+
+
+def remove_punctuation_character():
+    if not utils.directory_exist("cleaned"):
+        list_ponctuation = ["'", '"', "(", ")", ",", ";", ":", ".", "?", "!", "‘", "«", "»", "_", "-"]
+        files = utils.create_table_files_directory("cleaned" , ".txt")
+

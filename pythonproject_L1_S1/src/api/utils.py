@@ -20,3 +20,11 @@ def recover_names_presidents(table_files_speeches):
         final_var = var.split(".")[0]
         names_presidents.append(remove_digits(final_var))
     return names_presidents
+
+
+def create_table_files_directory(directory, extension):
+    files_names = []
+    for filename in os.listdir(directory):
+        if filename.endswith(extension):
+            files_names.append(filename)
+    return files_names

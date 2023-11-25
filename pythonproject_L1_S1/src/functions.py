@@ -1,5 +1,7 @@
 import os
 import shutil
+import string
+
 from api import utils
 
 
@@ -41,7 +43,13 @@ def cleaned(directory):
 
 
 def remove_punctuation_character():
-    if not utils.directory_exist("cleaned"):
-        list_ponctuation = ["'", '"', "(", ")", ",", ";", ":", ".", "?", "!", "‘", "«", "»", "_", "-"]
-        files = utils.create_table_files_directory("cleaned" , ".txt")
-
+    name_file = "cleaned"
+    files_names = utils.create_table_files_directory(name_file, ".txt")
+    for files in files_names:
+        file_path = os.path.join(name_file, files)
+        with open(file_path, "r") as text:
+            content = text.read()
+            print(content)
+            content_without_ponctuation_ = content.translate(str.maketrans("", "", string.punctuation))
+        with open(file_path, 'w') as cleaned_text:
+            cleaned_text.write(content_without_ponctuation_)

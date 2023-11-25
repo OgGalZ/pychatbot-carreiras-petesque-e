@@ -6,7 +6,7 @@ from api import utils
 
 
 def list_of_files(directory, extension):
-    utils.create_table_files_directory(directory, extension)
+    return utils.create_table_files_directory(directory, extension)
 
 
 def dict_names():  # faire un arg avec table files speeches
@@ -19,8 +19,8 @@ def dict_names():  # faire un arg avec table files speeches
     return noms
 
 
-def display_names(table_files_speeches):
-    table_names_presidents = utils.recover_names_presidents(table_files_speeches)
+def display_names(table_files_names):
+    table_names_presidents = utils.recover_names_presidents(table_files_names)
     new_list = []
     for names in table_names_presidents:
         if names not in new_list:
@@ -44,12 +44,12 @@ def cleaned(directory):
 
 def remove_punctuation_character():
     name_file = "cleaned"
-    files_names = utils.create_table_files_directory(name_file, ".txt")
-    for files in files_names:
-        file_path = os.path.join(name_file, files)
-        with open(file_path, "r") as text:
-            content = text.read()
-            print(content)
-            content_without_ponctuation_ = content.translate(str.maketrans("", "", string.punctuation))
-        with open(file_path, 'w') as cleaned_text:
-            cleaned_text.write(content_without_ponctuation_)
+    if utils.directory_exist(name_file):
+        files_names = utils.create_table_files_directory(name_file, ".txt")
+        for files in files_names:
+            file_path = os.path.join(name_file, files)
+            with open(file_path, "r") as text:
+                content = text.read()
+                content_without_ponctuation_ = content.translate(str.maketrans("", "", string.punctuation))
+            with open(file_path, 'w') as cleaned_text:
+                cleaned_text.write(content_without_ponctuation_)

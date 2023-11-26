@@ -35,3 +35,38 @@ def recover_string_file(directory, file):
     with open(file_path, 'r') as file:
         content = file.read()
     return content
+
+
+def remove_accents(texte):
+    """
+     remplace les lettres accentuées d'un texte par leur équivalent sans accent.
+    """
+    # Dictionnaire de correspondance des accents.
+    correspondances = {
+        'à': 'a', 'â': 'a', 'ä': 'a',
+        'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',
+        'î': 'i', 'ï': 'i',
+        'ô': 'o', 'ö': 'o',
+        'ù': 'u', 'û': 'u', 'ü': 'u',
+        'ç': 'c',
+    }
+    # Remplacement des caractères accentués.
+    return ''.join(correspondances.get(c, c) for c in texte)
+
+
+def table_is_nul(table):
+    return all(element == 0.0 for element in table)
+
+
+def values_max(dictionnary):
+    # Si le dictionnaire est vide, renvoyer une liste vide
+    if not dictionnary:
+        return []
+
+    # Trouver la valeur maximale
+    valeur_max = max(dictionnary.values())
+
+    # Trouver toutes les valeurs maximales
+    valeurs_max = [valeur for valeur in dictionnary.values() if valeur == valeur_max]
+
+    return valeurs_max

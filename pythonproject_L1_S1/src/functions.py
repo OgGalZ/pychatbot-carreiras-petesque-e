@@ -37,8 +37,9 @@ def cleaned(directory):
                 file_path = os.path.join(name_file, filename)
                 content = utils.recover_string_file(directory, filename)
                 content_lower = content.lower()
+                content_final = utils.remove_accents(content_lower)
                 with open(file_path, 'w') as cleaned_file:
-                    cleaned_file.write(content_lower)
+                    cleaned_file.write(content_final)
 
 
 def remove_punctuation_character():
@@ -67,7 +68,7 @@ def TF(string_content):
     return dict_tf
 
 
-def idf(directory):
+def IDF(directory):
     file_list = utils.create_table_files_directory(directory, '.txt')
     document_frequency = {}
     total_documents = len(file_list)
@@ -82,6 +83,31 @@ def idf(directory):
                 document_frequency[word] = 1
     idf_scores = {}
     for word in document_frequency:
-        idf_scores[word] = math.log(total_documents / (document_frequency.get(word))) + 1
+        idf_scores[word] = math.log(total_documents / (document_frequency.get(word)))
 
     return idf_scores
+
+
+def calculate_tf_idf(directory):
+    """
+     calcule la matrice TF-IDF pour tous les fichiers d'un répertoire.
+    """
+    # Dictionnaire pour la matrice TF-IDF.
+    tf_idf_matrice = {}
+    # Calcul des scores IDF.
+    idf_scores = IDF(directory)
+    # Liste des fichiers.
+    files = os.listdir(directory)
+    for filename in files:
+        if filename.endswith('.txt'):
+            # Calcul des scores TF pour le fichier actuel.
+            tf_scores = TF(utils.recover_string_file(directory, filename))
+            for mot, tf in tf_scores.items():
+                # Calcul du score TF-IDF.
+                tf_idf = tf * idf_scores[mot]
+                if mot in tf_idf_matrice:
+                    tf_idf_matrice[mot].append(tf_idf)
+                else:
+                    tf_idf_matrice[mot] = [tf_idf]
+
+    return tf_idf_matrice

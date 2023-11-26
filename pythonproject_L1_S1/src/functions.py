@@ -82,6 +82,6 @@ def idf(directory):
                 document_frequency[word] = 1
     idf_scores = {}
     for word in document_frequency:
-        idf_scores[word] = math.log(total_documents / (1 + document_frequency.get(word)))
+        idf_scores[word] = math.log(total_documents / (document_frequency.get(word))) + 1
 
     return idf_scores

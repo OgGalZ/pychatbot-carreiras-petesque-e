@@ -96,14 +96,13 @@ def climate(directory):
 def word_presidents_all(directory):
     content_files = fn.list_of_files(directory, ".txt")
     matrice_tfidf = fn.calculate_tf_idf(directory)
-    table_word =[]
-    table_word_
+    table_word = []
     for files in content_files:
         content = utils.recover_string_file(directory, files)
         term_frequencies = fn.TF(content)
         for element in term_frequencies.keys():
-            table_word.append(element)
+            if not utils.table_is_nul(matrice_tfidf[element]):
+                table_word.append(element)
 
-
-        table_word = set
-
+    table_word_single = set(table_word)
+    return table_word_single

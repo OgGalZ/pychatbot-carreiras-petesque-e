@@ -58,15 +58,4 @@ def table_is_nul(table):
     return all(element == 0.0 for element in table)
 
 
-def values_max(dictionnary):
-    # Si le dictionnaire est vide, renvoyer une liste vide
-    if not dictionnary:
-        return []
 
-    # Trouver la valeur maximale
-    valeur_max = max(dictionnary.values())
-
-    # Trouver toutes les valeurs maximales
-    valeurs_max = [valeur for valeur in dictionnary.values() if valeur == valeur_max]
-
-    return valeurs_max

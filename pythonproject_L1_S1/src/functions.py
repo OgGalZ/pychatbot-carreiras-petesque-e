@@ -35,8 +35,7 @@ def cleaned(directory):
         for filename in os.listdir(name_file):
             if filename.endswith("txt"):
                 file_path = os.path.join(name_file, filename)
-                with open(file_path, 'r') as file:
-                    content = file.read()
+                content = utils.recover_string_file(directory, filename)
                 content_lower = content.lower()
                 with open(file_path, 'w') as cleaned_file:
                     cleaned_file.write(content_lower)
@@ -48,10 +47,9 @@ def remove_punctuation_character():
         files_names = utils.create_table_files_directory(name_file, ".txt")
         for files in files_names:
             file_path = os.path.join(name_file, files)
-            with open(file_path, "r") as text:
-                content = text.read()
-                for char in string.punctuation:
-                    content = content.replace(char, ' ')
+            content = utils.recover_string_file(name_file, files)
+            for char in string.punctuation:
+                content = content.replace(char, ' ')
             with open(file_path, 'w') as cleaned_text:
                 cleaned_text.write(content)
     else:
@@ -61,9 +59,14 @@ def remove_punctuation_character():
 def TF(string_content):
     dict_tf = {}
     string_world = string_content.split()
-    for world in string_world:
-        if world not in dict_tf:
-            dict_tf[world] = 1
+    for word in string_world:
+        if word not in dict_tf:
+            dict_tf[word] = 1
         else:
-            dict_tf[world] = dict_tf[world] + 1
+            dict_tf[word] = dict_tf[word] + 1
     return dict_tf
+
+
+def IDF(repertory):
+    table = utils.create_table_files_directory(repertory, ".txt")
+

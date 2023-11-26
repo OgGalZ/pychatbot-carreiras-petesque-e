@@ -30,4 +30,8 @@ def create_table_files_directory(directory, extension):
     return files_names
 
 
-
+def recover_string_file(directory, file):
+    file_path = os.path.join(directory, file)
+    with open(file_path, 'r') as file:
+        content = file.read()
+    return content

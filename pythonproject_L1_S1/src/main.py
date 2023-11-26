@@ -1,8 +1,7 @@
 import functions as fn
 from api import utils
 
-directory = "./speeches-20231124"
+directory = "cleaned"
 files_names = fn.list_of_files(directory, "txt")
 
-
-
+print(fn.idf(directory))

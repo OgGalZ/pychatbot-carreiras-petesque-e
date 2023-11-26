@@ -1,7 +1,7 @@
 import os
 import shutil
 import string
-
+import math
 from api import utils
 
 
@@ -9,7 +9,7 @@ def list_of_files(directory, extension):
     return utils.create_table_files_directory(directory, extension)
 
 
-def dict_names():  # faire un arg avec table files speeches
+def dict_names():
     noms = {"Jacques": "Nomination_Chirac1.txt", "Jacques ": "Nomination_Chirac2.txt",
             "Valéry": "Nomination_Giscard dEstaing.txt", "François": "Nomination_Hollande.txt",
             "Emmanuel": "Nomination_Macron.txt", "François ": "Nomination_Mitterrand1.txt",
@@ -67,6 +67,21 @@ def TF(string_content):
     return dict_tf
 
 
-def IDF(repertory):
-    table = utils.create_table_files_directory(repertory, ".txt")
+def idf(directory):
+    file_list = utils.create_table_files_directory(directory, '.txt')
+    document_frequency = {}
+    total_documents = len(file_list)
 
+    for file_name in file_list:
+        content = utils.recover_string_file(directory, file_name)
+        unique_words = set(content.split())
+        for word in unique_words:
+            if word in document_frequency:
+                document_frequency[word] += 1
+            else:
+                document_frequency[word] = 1
+    idf_scores = {}
+    for word in document_frequency:
+        idf_scores[word] = math.log(total_documents / (1 + document_frequency.get(word)))
+
+    return idf_scores

@@ -50,6 +50,20 @@ def remove_punctuation_character():
             file_path = os.path.join(name_file, files)
             with open(file_path, "r") as text:
                 content = text.read()
-                content_without_ponctuation_ = content.translate(str.maketrans("", "", string.punctuation))
+                for char in string.punctuation:
+                    content = content.replace(char, ' ')
             with open(file_path, 'w') as cleaned_text:
-                cleaned_text.write(content_without_ponctuation_)
+                cleaned_text.write(content)
+    else:
+        print("use cleaned")
+
+
+def TF(string_content):
+    dict_tf = {}
+    string_world = string_content.split()
+    for world in string_world:
+        if world not in dict_tf:
+            dict_tf[world] = 1
+        else:
+            dict_tf[world] = dict_tf[world] + 1
+    return dict_tf

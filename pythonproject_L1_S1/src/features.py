@@ -2,6 +2,50 @@ import functions as fn
 from api import utils
 
 
+def main(directory):
+
+    files_names = fn.list_of_files(directory, '.txt')
+    fn.display_names(files_names)
+    fn.cleaned(directory)
+    repertory = "cleaned"
+    fn.remove_punctuation_character()
+    print("1. Afficher les mots moins importants")
+    print("2. Afficher les mots avec le plus grand TF-IDF")
+    print("3. Afficher les mots les plus fréquents dans les discours de Chirac")
+    print("4. Afficher le président ayant le plus utilisé le mot 'nation'")
+    print("5. Afficher le premier président à parler du climat et/ou de l'écologie")
+    print("6. Afficher tous les mots utilisés par les présidents")
+    print("0. Quitter")
+    choice = input("Choisissez une option (0-6): ")
+
+    if choice == "1":
+        result = display_world_less_important(repertory)
+        print("Mots moins importants:", result)
+
+    elif choice == "2":
+        result = dispay_worlds_more_tdidf(repertory)
+        print("Mots avec le plus grand TF-IDF:", result)
+
+    elif choice == "3":
+        result = worlds_most_repeated_chirac()
+        print("Mots les plus fréquents dans les discours de Chirac:", result)
+
+    elif choice == "4":
+        presidents_nation(repertory)
+
+    elif choice == "5":
+        climate(repertory)
+
+    elif choice == "6":
+        result = word_presidents_all(repertory)
+        print("Tous les mots utilisés par les présidents:", result)
+
+    elif choice == "0":
+        print("Au revoir!")
+    else:
+        print("Choix invalide. Veuillez choisir une option de 0 à 6.")
+
+
 def display_world_less_important(direcotry):
     world_less_important = []
     dict_matrice = fn.calculate_tf_idf(direcotry)

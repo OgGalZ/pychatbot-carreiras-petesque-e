@@ -3,7 +3,6 @@ from api import utils
 
 
 def main(directory):
-
     files_names = fn.list_of_files(directory, '.txt')
     fn.display_names(files_names)
     fn.cleaned(directory)
@@ -114,7 +113,6 @@ def climate(directory):
     content_files = fn.list_of_files(directory, ".txt")
 
     # Initialiser les variables pour stocker le président avec la fréquence maximale
-    max_president = None
     max_frequency = 0
 
     for files in content_files:
@@ -122,11 +120,12 @@ def climate(directory):
         content = utils.recover_string_file(directory, files)
 
         term_frequencies = fn.TF(content)
+        total_frequency = 0
 
-        # Calculer la fréquence totale des termes du champ lexical
-        total_frequency = sum(term_frequencies.get(term, 0) for term in field_climate)
+        for term in field_climate:
+            term_frequency = term_frequencies.get(term, 0)
+            total_frequency += term_frequency
 
-        # Mettre à jour le président avec la fréquence maximale
         if total_frequency > max_frequency:
             max_frequency = total_frequency
             max_president = files

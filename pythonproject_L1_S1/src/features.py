@@ -7,15 +7,15 @@ def main(directory):
     fn.display_names(files_names)
     fn.cleaned(directory)
     repertory = "cleaned"
-    fn.remove_punctuation_character()
+    fn.remove_punctuation_character(repertory)
     print("1. Afficher les mots moins importants")
     print("2. Afficher les mots avec le plus grand TF-IDF")
     print("3. Afficher les mots les plus fréquents dans les discours de Chirac")
-    print("4. Afficher le président ayant le plus utilisé le mot 'nation'")
-    print("5. Afficher le premier président à parler du climat et/ou de l'écologie")
-    print("6. Afficher tous les mots utilisés par les présidents")
+    print("4. Indiquer le(s) nom(s) du (des) président(s) qui a (ont) parlé de la « Nation » et celui qui l’a répété "
+          "le plus defois")
+    print("5. Indiquer le(s) nom(s) du (des) président(s) qui a (ont) parlé du climat et/ou de l’écologie")
     print("0. Quitter")
-    choice = input("Choisissez une option (0-6): ")
+    choice = input("Choisissez une option (0-5): ")
 
     if choice == "1":
         result = display_world_less_important(repertory)
@@ -34,11 +34,6 @@ def main(directory):
 
     elif choice == "5":
         climate(repertory)
-
-    elif choice == "6":
-        result = word_presidents_all(repertory)
-        print("Tous les mots utilisés par les présidents:", result)
-
     elif choice == "0":
         print("Au revoir!")
     else:
@@ -99,11 +94,13 @@ def presidents_nation(directory):
                 max_number = number_nation
                 president_most_nation[max_number] = files
     name = president_most_nation[max(president_most_nation)]
-    var = name.split("_")[1]
-    var1 = var.split(".")[0]
-    final_var = utils.remove_digits(var1)
+    var = utils.dict_names(name)
+    final_var = utils.remove_digits(var)
 
-    print("Le président {0} a utilisé {1} fois le mot nation  ".format(final_var, max(president_most_nation)))
+    print(
+        "Le président {0} a utilisé {1} fois le mot nation . Il sagit de celui qui l’a répété le plus de fois ".format(
+            final_var, max(president_most_nation)))
+    print("Le(s) président(s) qui a (ont) parlé de la « Nation »")
     return fn.display_names(names_presidents)
 
 
@@ -111,6 +108,7 @@ def climate(directory):
     field_climate = ["climat", "ecologie", "nature", "environnement", "biodiversite", "pollution", "durabilite",
                      "ressources", "developpement durable", "energie"]
     content_files = fn.list_of_files(directory, ".txt")
+    presidents_climate = []
 
     # Initialiser les variables pour stocker le président avec la fréquence maximale
     max_frequency = 0
@@ -121,31 +119,20 @@ def climate(directory):
 
         term_frequencies = fn.TF(content)
         total_frequency = 0
-
         for term in field_climate:
+            if utils.dict_names(files) not in presidents_climate:
+                if term in field_climate:
+                    if not utils.dict_names(files) is None:
+                        presidents_climate.append(utils.dict_names(files))
+
             term_frequency = term_frequencies.get(term, 0)
             total_frequency += term_frequency
 
         if total_frequency > max_frequency:
             max_frequency = total_frequency
-            max_president = files
-            var1 = max_president.split(".")[0]
-            var = var1.split("_")[1]
+            var = utils.dict_names(files)
 
     # Afficher le président avec la fréquence maximale
-    print("Le premier président à parler du climat et/ou de l'écologie est :", var)
-
-
-def word_presidents_all(directory):
-    content_files = fn.list_of_files(directory, ".txt")
-    matrice_tfidf = fn.calculate_tf_idf(directory)
-    table_word = []
-    for files in content_files:
-        content = utils.recover_string_file(directory, files)
-        term_frequencies = fn.TF(content)
-        for element in term_frequencies.keys():
-            if not utils.table_is_nul(matrice_tfidf[element]):
-                table_word.append(element)
-
-    table_word_single = set(table_word)
-    return table_word_single
+    print("Le  président qui à parler le plus du climat et/ou de l'écologie est :", var)
+    print("Les présidents qui ont parlé le plus du climat et/ou de l'écologie sont :")
+    print(presidents_climate)

@@ -58,4 +58,17 @@ def table_is_nul(table):
     return all(element == 0.0 for element in table)
 
 
+def dict_names(name_file):
+    noms = {"Chirac": "Nomination_Chirac1.txt", "Chirac": "Nomination_Chirac2.txt",
+            "Giscard dEstaing": "Nomination_Giscard dEstaing.txt", "Hollande": "Nomination_Hollande.txt",
+            "Macron": "Nomination_Macron.txt", "Mitterand": "Nomination_Mitterrand1.txt",
+            "Mitterand": "Nomination_Mitterrand2.txt", "Sarkozy": "Nomination_Sarkozy.txt"}
 
+    # Parcourir chaque élément du dictionnaire
+    for nom, fichier in noms.items():
+        # Vérifier si le nom de fichier correspond à la valeur recherchée
+        if fichier == name_file:
+            # Retourner le nom correspondant à la valeur
+            return nom
+    # Si la valeur n'est pas trouvée, retourner None ou une valeur par défaut
+    return None

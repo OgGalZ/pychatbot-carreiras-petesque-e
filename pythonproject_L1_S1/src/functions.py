@@ -9,16 +9,6 @@ def list_of_files(directory, extension):
     return utils.create_table_files_directory(directory, extension)
 
 
-def dict_names():
-    noms = {"Jacques": "Nomination_Chirac1.txt", "Jacques ": "Nomination_Chirac2.txt",
-            "Valéry": "Nomination_Giscard dEstaing.txt", "François": "Nomination_Hollande.txt",
-            "Emmanuel": "Nomination_Macron.txt", "François ": "Nomination_Mitterrand1.txt",
-            " François ": "Nomination_Mitterrand2.txt", "Nicolas": "Nomination_Sarkozy.txt"}
-    for (a, b) in noms.items():
-        print("{}, {}".format(a, b))
-    return noms
-
-
 def display_names(table_files_names):
     table_names_presidents = utils.recover_names_presidents(table_files_names)
     new_list = []
@@ -42,8 +32,7 @@ def cleaned(directory):
                     cleaned_file.write(content_final)
 
 
-def remove_punctuation_character():
-    name_file = "cleaned"
+def remove_punctuation_character(name_file):
     if utils.directory_exist(name_file):
         files_names = utils.create_table_files_directory(name_file, ".txt")
         for files in files_names:
@@ -111,3 +100,4 @@ def calculate_tf_idf(directory):
                     tf_idf_matrice[mot] = [tf_idf]
 
     return tf_idf_matrice
+

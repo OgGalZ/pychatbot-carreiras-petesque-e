@@ -32,7 +32,7 @@ def cleaned(directory):
                     cleaned_file.write(content_final)
 
 
-def remove_punctuation_character(name_file):
+def remove_punctuation_character_file(name_file):
     if utils.directory_exist(name_file):
         files_names = utils.create_table_files_directory(name_file, ".txt")
         for files in files_names:
@@ -100,4 +100,3 @@ def calculate_tf_idf(directory):
                     tf_idf_matrice[mot] = [tf_idf]
 
     return tf_idf_matrice
-

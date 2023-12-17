@@ -7,7 +7,7 @@ def main(directory):
     fn.display_names(files_names)
     fn.cleaned(directory)
     repertory = "cleaned"
-    fn.remove_punctuation_character(repertory)
+    fn.remove_punctuation_character_file(repertory)
     print("1. Afficher les mots moins importants")
     print("2. Afficher les mots avec le plus grand TF-IDF")
     print("3. Afficher les mots les plus fréquents dans les discours de Chirac")

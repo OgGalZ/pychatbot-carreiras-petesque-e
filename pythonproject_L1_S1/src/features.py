@@ -144,44 +144,15 @@ def climate(directory):
     print(presidents_climate)
 
 
-def generate_response(question, directory, source_directory):
-    file_list = fn.list_of_files(directory, ".txt")
-    vector = fn.vecteur_TF_IDF(question, directory)
-    matrix = fn.calculate_tf_idf(directory)
-    document = fn.similarity_documents_et_vectors(matrix, vector, file_list)
-
-    word_list = fn.tokenize_question(question)
-    idf_values =fn.IDF(directory)
-    tf_question = {}
-
-    for word in word_list:
-        score = 0
-        for i in word_list:
-            if i == word:
-                score += 1
-        tf_question[word] = score / len(word_list)
-
-    word_dictionary = {}
-    for word in idf_values:
-        if word in word_list:
-            word_dictionary[word] = tf_question[word] * idf_values[word]
-        else:
-            word_dictionary[word] = 0
-
-    important_word = utils.key_associee_a_var_max_dict(word_dictionary)
-
-    with open(f"{source_directory}/{document}", "r") as file:
-        content = file.read()
-        separators = ['.', '!', '?']
-        sentences = []
-        current_sentence = ""
-
-        for character in content:
-            current_sentence += character
-            if character in separators:
-                sentences.append(current_sentence)
-                current_sentence = ""
-
-        for sentence in sentences:
-            if important_word in sentence:
-                return sentence
+def display_answer(question, dossier, dossier_origine):
+    # Liste de propositions non exhaustives
+    question_starters = {"Comment": "Après analyse, ",
+                         "Pourquoi": "Car, ",
+                         "Peux-tu": "Oui, bien sûr! "}
+    reponse = fn.generate_response(question, dossier, dossier_origine)
+    phrase_actuelle = ""
+    for caractere in question:
+        phrase_actuelle += caractere
+        if phrase_actuelle in question_starters.keys():
+            return question_starters[phrase_actuelle] + reponse
+    return reponse

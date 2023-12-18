@@ -91,3 +91,14 @@ def vector_norm(vector):
         summation += (vector[i]) ** 2
     result = math.sqrt(summation)
     return result
+
+
+def key_associee_a_var_max_dict(dict):
+    # Fonction qui renvoie la clé associée à la plus grande valeur du dictionnnaire
+    max = 0
+    document = ""
+    for cle, val in dict.items():
+        if max < val:
+            max = val
+            document = cle
+    return document

@@ -1,7 +1,8 @@
 import features as ft
-import functions2
-"""directory = input("Veuillez entrer le chemin du répertoire : ")
-directory = "speeches-20231124"
-ft.main(directory)"""
+import functions1
+from api import  utils
 
-print(functions2.tokenize_question("Veuillez entrer' lea' chemin du répertoire -:  55"))
+"""directory = input("Veuillez entrer le chemin du répertoire : ")"""
+directory = "speeches-20231124"
+ft.main(directory)
+

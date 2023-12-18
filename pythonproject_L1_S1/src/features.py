@@ -66,8 +66,14 @@ def worlds_most_repeated_chirac():
     content_file2_chirac = utils.recover_string_file("cleaned", "Nomination_Chirac2.txt")
     score_td_file1 = fn.TF(content_file1_chirac)
     score_td_file2 = fn.TF(content_file2_chirac)
-    value_max_file1 = max(score_td_file1.values())
-    value_max_file2 = max(score_td_file2.values())
+    score_td_file1_without = {key: value for key, value in score_td_file1.items() if
+                              not utils.table_is_nul(fn.calculate_tf_idf("cleaned")[key])}
+
+    score_td_file2_without = {key: value for key, value in score_td_file2.items() if
+                              not utils.table_is_nul(fn.calculate_tf_idf("cleaned")[key])}
+
+    value_max_file1 = max(score_td_file1_without.values())
+    value_max_file2 = max(score_td_file2_without.values())
     value_max = max(value_max_file1, value_max_file2)
     for key in score_td_file1:
         if score_td_file1[key] == value_max:

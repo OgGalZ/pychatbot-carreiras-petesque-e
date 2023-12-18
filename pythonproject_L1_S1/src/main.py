@@ -9,3 +9,4 @@ ft.main(directory)"""
 
 print(functions2.vecteur_TF_IDF(
     "messieurs les presidents  mesdames  mesdemoiselles  messieurs  de ce jour  de ", "cleaned"))
+print(functions1.TF("messieurs les presidents  mesdames  mesdemoiselles  messieurs  de ce jour  de "))

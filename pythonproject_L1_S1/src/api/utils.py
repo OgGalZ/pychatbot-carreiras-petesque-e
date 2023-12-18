@@ -1,3 +1,4 @@
+import math
 import os
 
 
@@ -72,3 +73,21 @@ def dict_names(name_file):
             return nom
     # Si la valeur n'est pas trouvée, retourner None ou une valeur par défaut
     return None
+
+
+# 4 - Similarity Calculation
+def dot_product(vector1, vector2):
+    if len(vector1) != len(vector2):
+        return "Les vecteurs ne sont pas de la même longueur, on ne peut pas calculer le produit scalaire."
+    summation = 0
+    for i in range(len(vector1)):
+        summation += vector1[i] * vector2[i]
+    return summation
+
+
+def vector_norm(vector):
+    summation = 0
+    for i in range(len(vector)):
+        summation += (vector[i]) ** 2
+    result = math.sqrt(summation)
+    return result

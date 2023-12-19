@@ -241,7 +241,7 @@ def calcul_similarite(tf_idf_txts, tf_idf_question, dict_txt):
     for txt in dict_produit_scalaire.keys():
         if (norme_vect(tf_idf_txts[dict_txt[txt]]) * norme_vect(tf_idf_question[0])) != 0:
             dict_simil[txt] = dict_produit_scalaire[txt] / (
-                        norme_vect(tf_idf_txts[dict_txt[txt]]) * norme_vect(tf_idf_question[0]))
+                    norme_vect(tf_idf_txts[dict_txt[txt]]) * norme_vect(tf_idf_question[0]))
     return dict_produit_scalaire
 
 
@@ -313,10 +313,13 @@ def phrase_reponse(question_type, fin_reponse):
         response_type = question_starters[question_type]
         if 65 <= ord(fin_reponse[0]) <= 90:
             fin_reponse = chr(ord(fin_reponse[0]) + 32) + fin_reponse[1:]
-    return generic_response + '\n' + response_type + fin_reponse + '.'
+    return generic_response + '\n' + response_type + str(fin_reponse) + '.'
 
 
 def matrice_TF_IDF(dict_txt, dict_mots, dict_tf_idf, matrice):
+    """
+    Remplit une matrice avec les valeurs TF-IDF des termes dans chaque document.
+    """
     for nom_fichier, num_ligne in dict_txt.items():
         for mot, num_colonne in dict_mots.items():
             if nom_fichier in dict_tf_idf and mot in dict_tf_idf[nom_fichier]:
@@ -324,11 +327,16 @@ def matrice_TF_IDF(dict_txt, dict_mots, dict_tf_idf, matrice):
     return matrice
 
 
+
 def tf_idf(dict_tf, idf):
-    for dict in dict_tf.values():
-        for word in dict.keys():
-            if word in idf.keys():
-                dict[word] *= idf[word]
+    """
+    Calcule le produit TF-IDF pour chaque terme dans un dictionnaire de TF (term frequency).
+    """
+    for document_tf in dict_tf.values():
+        for term, tf in document_tf.items():
+            if term in idf:
+                document_tf[term] *= idf[term]
             else:
-                dict[word] = 0
+                # Si le terme n'a pas d'IDF, on le met à zéro.
+                document_tf[term] = 0
     return dict_tf

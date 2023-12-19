@@ -1,4 +1,4 @@
-#Chatbot - Enzo C et Enzo P - fonctions permettant d'automatiser
+# Chatbot - Enzo C et Enzo P - fonctions permettant d'automatiser
 
 import os
 import shutil
@@ -51,7 +51,7 @@ def cleaned(directory):
                 content_lower = content.lower()
                 # Suppression des accents.
                 content_final = utils.remove_accents(content_lower)
-                with open(file_path, 'w') as cleaned_file:
+                with open(file_path, 'w', encoding="utf-8") as cleaned_file:
                     cleaned_file.write(content_final)
 
 
@@ -70,7 +70,7 @@ def remove_punctuation_character_file(name_file):
             # Remplace chaque caractère de ponctuation par un espace.
             for char in string.punctuation:
                 content = content.replace(char, ' ')
-            with open(file_path, 'w') as cleaned_text:
+            with open(file_path, 'w', encoding="utf-8") as cleaned_text:
                 cleaned_text.write(content)
     else:
         print("Le répertoire spécifié n'existe pas. Utilisez la fonction 'cleaned' d'abord.")
@@ -99,7 +99,7 @@ def tffile(directory):
     dict_tf = {}
     for files in file_list:
         file_path = os.path.join(directory, files)
-        with open(file_path, "r") as text:
+        with open(file_path, "r", encoding="utf-8") as text:
             content = text.read()
             n = TF(content)
             dict_tf[files] = n
@@ -273,7 +273,7 @@ def capitalize_first_letter(word):
 
 
 # Fonction trouvant la phrase contenat le mot avec le tf-idf le plus élevé
-def trouver_phrase_reponse(mot, directory):
+def find_phrase_reponse(mot, directory):
     # Renvoie la première phrase dans le document qui contient le mot donné.
     with open(directory, 'r', encoding='utf-8') as file:
         document = file.read()
@@ -313,8 +313,6 @@ def phrase_reponse(question_type, fin_reponse):
     response_type = ''
     if question_type in question_starters.keys():
         response_type = question_starters[question_type]
-        if 65 <= ord(fin_reponse[0]) <= 90:
-            fin_reponse = chr(ord(fin_reponse[0]) + 32) + fin_reponse[1:]
     return generic_response + '\n' + response_type + str(fin_reponse) + '.'
 
 
@@ -327,7 +325,6 @@ def matrice_TF_IDF(dict_txt, dict_mots, dict_tf_idf, matrice):
             if nom_fichier in dict_tf_idf and mot in dict_tf_idf[nom_fichier]:
                 matrice[num_ligne][num_colonne] = dict_tf_idf[nom_fichier][mot]
     return matrice
-
 
 
 def tf_idf(dict_tf, idf):

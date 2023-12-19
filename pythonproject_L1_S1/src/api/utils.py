@@ -42,7 +42,7 @@ def create_table_files_directory(directory, extension):
 def recover_string_file(directory, file):
     # récupére le string d'un file
     file_path = os.path.join(directory, file)
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r' , encoding="utf-8") as file:
         content = file.read()
     return content
 

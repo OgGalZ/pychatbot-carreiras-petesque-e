@@ -1,4 +1,4 @@
-#Chatbot - Enzo C et Enzo P -Les fonctionnalités du projet
+# Chatbot - Enzo C et Enzo P -Les fonctionnalités du projet
 
 import functions as fn
 from api import utils
@@ -242,7 +242,7 @@ def chatbot():
     # Création du chemin vers le texte le plus important dans le dossier speeches
     directory_txt_important = directory + "/" + similarite_max
     # Création de la fin réponse correspondant à la phrase avec le mot ayant le plus haut tf-idf dans la question
-    fin_reponse = fn.trouver_phrase_reponse(idf_question_max, directory_txt_important)
+    fin_reponse = fn.find_phrase_reponse(idf_question_max, directory_txt_important)
     # Création de la réponse et affichage de celle-ci
     response = fn.phrase_reponse(tokens[0], fin_reponse)
     print(response)

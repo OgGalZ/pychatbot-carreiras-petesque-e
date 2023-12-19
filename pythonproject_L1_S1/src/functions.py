@@ -91,6 +91,19 @@ def TF(string_content):
     return dict_tf
 
 
+# Fonction pour calculer le TF pour chaque fichier dans un répertoire
+def tffile(directory):
+    file_list = list_of_files(directory, '.txt')
+    dict_tf = {}
+    for files in file_list:
+        file_path = os.path.join(directory, files)
+        with open(file_path, "r") as text:
+            content = text.read()
+            n = TF(content)
+            dict_tf[files] = n
+    return dict_tf
+
+
 def IDF(directory):
     """
     Calcule le score IDF (Inverse Document Frequency) pour chaque terme dans un répertoire de fichiers.
@@ -146,6 +159,7 @@ def calculate_tf_idf(directory):
     return tf_idf_matrice
 
 
+# Fonction pour tokenizer une question
 def tokenize_question(question):
     """
     Tokenize une question en la normalisant.
@@ -179,104 +193,142 @@ def search_words_in_corpus(question):
     return corpus_word_list
 
 
-def vecteur_TF_IDF(question, dossier):
-    liste = tokenize_question(question)
-    idf = IDF(dossier)
-    print(idf)
-    tf_question = {}
-    for mot in liste:  # Calcul du TF de chaque mot de la question
-        score = 0
-        for i in liste:
-            if i == mot:
-                score += 1
-        tf_question[mot] = score
-    liste_tf_idf_question = []
-    for mot in idf:  # On créé le vecteur TF-IDF de la question
-        if mot in liste:
-            score = tf_question[mot] * idf[mot]
-            liste_tf_idf_question.append(score)
-        else:
-            liste_tf_idf_question.append(0)
-    return liste_tf_idf_question
+# Fonction mettant le tf des mots peu importants à 0
+def remove_useless_words(liste_common_terms, dict_words):
+    for mot in dict_words.keys():
+        if mot not in liste_common_terms:
+            dict_words[mot] = 0
+    return dict_words
 
 
-def calculate_similarity(vector1, vector2):
-    """
-    Calcule la similarité cosinus entre deux vecteurs.
-
-    :param vector1: Premier vecteur
-    :param vector2: Deuxième vecteur
-    :return: Valeur de similarité cosinus entre les deux vecteurs
-    """
-    dot_product_v1v2 = utils.dot_product(vector1, vector2)
-    norm1 = utils.vector_norm(vector1)
-    norm2 = utils.vector_norm(vector2)
-    result = dot_product_v1v2 / (norm1 * norm2)
-    return result
+# Fonction qui crée une matrice représentant le vecteur de la question
+def f_vecteurs_question(dict_mots, dict_tf_idf, matrice):
+    for mot, num_colonne in dict_mots.items():
+        if mot in dict_tf_idf["question"].keys():
+            for i in range(len(matrice)):
+                matrice[i][num_colonne] = dict_tf_idf["question"][mot]
+    return matrice
 
 
-def similarity_documents_et_vectors(matrice, vector, list):
-    """
-    Calcule la similarité cosinus entre un vecteur et tous les vecteurs d'une matrice.
-
-    :param matrice: Matrice de vecteurs TF-IDF
-    :param vector: Vecteur TF-IDF de la question
-    :param list: Liste des noms des documents correspondant aux vecteurs dans la matrice
-    :return: Nom du document avec la similarité maximale
-    """
-    dictionnaire = {}
-    for i in range(len(matrice)):
-        resultat = calculate_similarity(matrice[i], vector)
-        dictionnaire[list[i]] = resultat
-    return utils.key_associee_a_var_max_dict(dictionnaire)
+# Fonction qui fait le calcule du produit scalaire entre le vecteur d'un texte et le vecteur d'une question
+def produit_scalaire(tf_idf_txt, tf_idf_question):
+    produit_scalaire_txt_question = 0
+    for i in range(len(tf_idf_txt)):
+        produit_scalaire_txt_question += tf_idf_txt[i] * tf_idf_question[i]
+    return produit_scalaire_txt_question
 
 
-def generate_response(question, directory, source_directory):
-    """
-    Génère une réponse à la question en utilisant le modèle TF-IDF et la similarité cosinus.
+# Fonction créant un dictionnaire avec les produits scalaires
+def dict_prod_scal(tf_idf_txts, tf_idf_question, dict_txt):
+    dict_produit_scalaire = {}
+    for txt, i in dict_txt.items():
+        dict_produit_scalaire[txt] = produit_scalaire(tf_idf_txts[i], tf_idf_question[0])
+    return dict_produit_scalaire
 
-    :param question: Question posée
-    :param directory: Répertoire des fichiers source
-    :param source_directory: Répertoire de stockage des fichiers nettoyés
-    :return: Réponse générée
-    """
-    file_list = list_of_files(directory, ".txt")
-    vector = vecteur_TF_IDF(question, directory)
-    matrix = calculate_tf_idf(directory)
-    document = similarity_documents_et_vectors(matrix, vector, file_list)
 
-    word_list = tokenize_question(question)
-    idf_values = IDF(directory)
-    tf_question = {}
+# Fonction calculant la norme d'un vecteur
+def norme_vect(tf_idf_liste):
+    norme_vecteur = 0
+    for i in range(len(tf_idf_liste)):
+        norme_vecteur += tf_idf_liste[i] ** 2
+    return math.sqrt(norme_vecteur)
 
-    for word in word_list:
-        score = 0
-        for i in word_list:
-            if i == word:
-                score += 1
-        tf_question[word] = score / len(word_list)
 
-    word_dictionary = {}
-    for word in idf_values:
-        if word in word_list:
-            word_dictionary[word] = tf_question[word] * idf_values[word]
-        else:
-            word_dictionary[word] = 0
+# Fonction calculant la similarité de la question avec les textes
+def calcul_similarite(tf_idf_txts, tf_idf_question, dict_txt):
+    dict_produit_scalaire = dict_prod_scal(tf_idf_txts, tf_idf_question, dict_txt)
+    dict_simil = {}
+    for txt in dict_produit_scalaire.keys():
+        if (norme_vect(tf_idf_txts[dict_txt[txt]]) * norme_vect(tf_idf_question[0])) != 0:
+            dict_simil[txt] = dict_produit_scalaire[txt] / (
+                        norme_vect(tf_idf_txts[dict_txt[txt]]) * norme_vect(tf_idf_question[0]))
+    return dict_produit_scalaire
 
-    important_word = utils.key_associee_a_var_max_dict(word_dictionary)
 
-    with open(f"{source_directory}/{document}", "r") as file:
-        content = file.read()
-        separators = ['.', '!', '?']
-        sentences = []
-        current_sentence = ""
+# Fonction retournant la clef de la valeur la plus grande dans un dictionnaire avec des entiers en valeur.
+def keys_max(dict):
+    maximum = float('-inf')  # Initialiser à moins l'infini pour assurer que tout nombre sera plus grand
+    txt_max = ''
+    for txt, valeur in dict.items():
+        if valeur > maximum:
+            maximum = valeur
+            txt_max = txt
+    return txt_max
 
-        for character in content:
-            current_sentence += character
-            if character in separators:
-                sentences.append(current_sentence)
-                current_sentence = ""
 
-        for sentence in sentences:
-            if important_word in sentence:
-                return sentence
+# Fonction retournant le texte avec le plus de similarité avec la question
+def sim_max(tf_idf_txts, tf_idf_question, dict_txt):
+    dict_sim = calcul_similarite(tf_idf_txts, tf_idf_question, dict_txt)
+    return keys_max(dict_sim)
+
+
+# Fonction tranformant la première lettre d'un mot en majuscule
+def capitalize_first_letter(word):
+    if len(word) > 0:
+        return word[0].upper() + word[1:]
+    else:
+        return word
+
+
+# Fonction trouvant la phrase contenat le mot avec le tf-idf le plus élevé
+def trouver_phrase_reponse(mot, directory):
+    # Renvoie la première phrase dans le document qui contient le mot donné.
+    with open(directory, 'r', encoding='utf-8') as file:
+        document = file.read()
+    phrases = document.split('.')
+    mot_maj = capitalize_first_letter(mot)
+    for phrase in phrases:
+        if mot in phrase:
+            return phrase.strip()
+        elif mot_maj in phrase:
+            return phrase.strip()
+
+
+# Fonction formulant la question
+def phrase_reponse(question_type, fin_reponse):
+    question_starters = {
+        "comment": "Après analyse, ",
+        "pourquoi": "Car, ",
+        "peux": "Oui, bien sûr, ",
+        "quand": "À ce moment-là, ",
+        "ou": "Là où cela se passe, ",
+        "quoi": "En fait, ",
+        "qui": "En ce qui concerne la personne en question, ",
+        "combien": "En quantité, ",
+        "est": "Assurément, ",
+        "pouvez": "Bien entendu, ",
+        "quelle": "La réponse à cette question est : ",
+        "explique": "Permettez-moi de vous expliquer que ",
+        "décris": "Permettez-moi de vous décrire que ",
+        "imagine": "Imaginez que ",
+        "prevois": "Si l'on prévoit, ",
+        "raconte": "Permettez-moi de vous raconter que ",
+        "partage": "Permettez-moi de partager que ",
+        "resume": "En résumé, ",
+    }
+
+    generic_response = "Voici la réponse à votre question. "
+    response_type = ''
+    if question_type in question_starters.keys():
+        response_type = question_starters[question_type]
+        if 65 <= ord(fin_reponse[0]) <= 90:
+            fin_reponse = chr(ord(fin_reponse[0]) + 32) + fin_reponse[1:]
+    return generic_response + '\n' + response_type + fin_reponse + '.'
+
+
+def matrice_TF_IDF(dict_txt, dict_mots, dict_tf_idf, matrice):
+    for nom_fichier, num_ligne in dict_txt.items():
+        for mot, num_colonne in dict_mots.items():
+            if nom_fichier in dict_tf_idf and mot in dict_tf_idf[nom_fichier]:
+                matrice[num_ligne][num_colonne] = dict_tf_idf[nom_fichier][mot]
+    return matrice
+
+
+def tf_idf(dict_tf, idf):
+    for dict in dict_tf.values():
+        for word in dict.keys():
+            if word in idf.keys():
+                dict[word] *= idf[word]
+            else:
+                dict[word] = 0
+    return dict_tf

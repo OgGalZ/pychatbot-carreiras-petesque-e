@@ -1,5 +1,7 @@
 import functions as fn
 from api import utils
+from pythonproject_L1_S1.src.api.utils import remove_accents, clean_str, matrice_0, dict_string_nbr, \
+    list_mots_uniques_corpus
 
 
 def main(directory):
@@ -23,11 +25,11 @@ def main(directory):
         print("Mots moins importants:", result)
 
     elif choice == "2":
-        result = dispay_worlds_more_tdidf(repertory)
+        result = words_most_repeated_chirac()
         print("Mots avec le plus grand TF-IDF:", result)
 
     elif choice == "3":
-        result = worlds_most_repeated_chirac()
+        result = words_most_repeated_chirac()
         print("Mots les plus fréquents dans les discours de Chirac:", result)
 
     elif choice == "4":
@@ -36,8 +38,7 @@ def main(directory):
     elif choice == "5":
         climate(repertory)
     elif choice == "6":
-        question = input("  Veuillez entrer votre question")
-        display_answer(question, repertory, directory)
+        chatbot()
     elif choice == "0":
         print("Au revoir!")
     else:
@@ -91,10 +92,10 @@ def words_most_repeated_chirac():
 
     # Exclusion des mots avec un score TF-IDF nul
     score_tf_file1_without_null_tfidf = {key: value for key, value in score_tf_file1.items() if
-                                         not utils.table_is_null(fn.calculate_tf_idf("cleaned")[key])}
+                                         not utils.table_is_nul(fn.calculate_tf_idf("cleaned")[key])}
 
     score_tf_file2_without_null_tfidf = {key: value for key, value in score_tf_file2.items() if
-                                         not utils.table_is_null(fn.calculate_tf_idf("cleaned")[key])}
+                                         not utils.table_is_nul(fn.calculate_tf_idf("cleaned")[key])}
 
     # Recherche des mots ayant le score TF le plus élevé
     value_max_file1 = max(score_tf_file1_without_null_tfidf.values())
@@ -188,26 +189,58 @@ def climate(directory):
     print("Les présidents qui ont parlé du climat et/ou de l'écologie sont :", presidents_climate)
 
 
-def display_answer(question, dossier, dossier_origine):
-    """
-    Affiche une réponse à la question en fonction de son format.
+def chatbot():
+    t = 0.5
+    # Import des variables utilent développées dans la partie 1
+    # Chemin des deux fichiers utilisés
+    directory = "./speeches-20231124"
+    directory2 = "./cleaned"
+    # Liste des fichiers dans cleaned
+    files_names_cleaned = fn.list_of_files(directory2, "txt")
+    # Dictionnaire des fichiers avec un nombre unique leur étant associé allant de 0 à 7
+    # pour facilité la création d'une matrice
+    dict_fichier = utils.dict_string_nbr(files_names_cleaned)
+    # Dictionnaire des mots uniques du corpus avec un nombre unique leur étant associé allant de 0 à nombre de mots - 1
+    # pour facilité la création d'une matrice
+    dict_mots_uniques_corpus = utils.dict_string_nbr(utils.list_mots_uniques_corpus(directory2))
+    # Création d'une matrice avec pour dimension le nombre de textes pour les lignes et
+    # le nombres de mots uniques dans le corpus pour les colonnes
+    # avec que des 0 pour faciliter l'attribution des valeurs tf-idf des mots
+    # qui ne sont pas dans un tetxe, c'est-à-dire avec un tf-idf de 0
+    matrice0 = utils.matrice_0(dict_fichier, dict_mots_uniques_corpus)
+    # Création d'un dictionnaire avec l'ensemble des tf-idf pour faciliter la création de la matrice
+    dict_tf_idf = fn.tf_idf(fn.tffile(directory2), fn.IDF(directory2))
+    # Création de la matrice tf-idf avec les valeurs tf-idf des mots dans les textes
+    matrice_tf_idf = fn.matrice_TF_IDF(dict_fichier, dict_mots_uniques_corpus, dict_tf_idf, matrice0)
 
-    :param question: La question posée.
-    :param dossier: Le répertoire contenant les fichiers texte des discours des présidents.
-    :param dossier_origine: Le répertoire d'origine.
-    :return: La réponse générée.
-    """
-    # Liste de propositions non exhaustives
-    question_starters = {"Comment": "Après analyse, ",
-                         "Pourquoi": "Car, ",
-                         "Peux-tu": "Oui, bien sûr! "}
-
-    reponse = fn.generate_response(question, dossier, dossier_origine)
-    phrase_actuelle = ""
-
-    for caractere in question:
-        phrase_actuelle += caractere
-        if phrase_actuelle in question_starters.keys():
-            return question_starters[phrase_actuelle] + reponse
-
-    return reponse
+    # Saisie de la question
+    question = str(input("Veuillez saisir votre question : "))
+    # Tokenisation de la question
+    tokens = fn.tokenize_question(question)
+    tokens_usefull = utils.remove_useless_tokens(tokens)
+    # Trouve les mots en communs avec les textes
+    common_terms = utils.find_common_terms(tokens_usefull, directory2)
+    print("Termes communs dans le corpus :", common_terms)
+    # TF de la question
+    question_tf = fn.remove_useless_words(common_terms, fn.TF(remove_accents(utils.clean_str(question))))
+    # TF sous la forme d'un dictionnaire pour pouvoir être utiliser dans la fonction tf_idf
+    question_tf_dict = {"question": question_tf}
+    # TF_IDF de la question
+    question_tf_idf = fn.tf_idf(question_tf_dict, fn.IDF(directory2))
+    # Création d'une matrice pour le vecteur de la question
+    matrice0_2 = matrice_0(dict_fichier, dict_mots_uniques_corpus)
+    # Création du vecteur de la question
+    vecteurs_question = fn.f_vecteurs_question(dict_mots_uniques_corpus, question_tf_idf, matrice0_2)
+    # Calcul de la simlarité de la question avec les textes et recherche du texte avec le plus de similarité
+    similarite_max = fn.sim_max(matrice_tf_idf, vecteurs_question, dict_fichier)
+    print("Document pertinent retourné : ", similarite_max)
+    # Recherche du mot avec le tf-idf le plus grand dans la question
+    idf_question_max = fn.keys_max(question_tf_idf['question'])
+    print("Mot ayant le TF-IDF le plus élevé :", idf_question_max)
+    # Création du chemin vers le texte le plus important dans le dossier speeches
+    directory_txt_important = directory + "/" + similarite_max
+    # Création de la fin réponse correspondant à la phrase avec le mot ayant le plus haut tf-idf dans la question
+    fin_reponse = fn.trouver_phrase_reponse(idf_question_max, directory_txt_important)
+    # Création de la réponse et affichage de celle-ci
+    response = fn.phrase_reponse(tokens[0], fin_reponse)
+    print(response)

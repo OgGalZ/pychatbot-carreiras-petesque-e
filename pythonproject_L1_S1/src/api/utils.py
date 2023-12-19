@@ -1,3 +1,4 @@
+##Chatbot - Enzo C et Enzo P - Les fonctions qui sont utiles pour le dossier functions en majorité
 import math
 import os
 import string

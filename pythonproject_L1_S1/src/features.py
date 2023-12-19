@@ -1,3 +1,5 @@
+#Chatbot - Enzo C et Enzo P -Les fonctionnalités du projet
+
 import functions as fn
 from api import utils
 from pythonproject_L1_S1.src.api.utils import remove_accents, clean_str, matrice_0, dict_string_nbr, \

@@ -3,6 +3,7 @@ import os
 
 
 def remove_digits(string):
+    #supprime les chiffres
     new_string = ""
     for character in string:
         if not character.isdigit():
@@ -11,10 +12,12 @@ def remove_digits(string):
 
 
 def directory_exist(chemin_repertoire):
+    #vérifie si un dossier existe
     return os.path.exists(chemin_repertoire) and os.path.isdir(chemin_repertoire)
 
 
 def recover_names_presidents(table_files_speeches):
+    #récupère le nom des présidents
     names_presidents = []
     for names in table_files_speeches:
         var = names.split("_")[1]
@@ -24,6 +27,7 @@ def recover_names_presidents(table_files_speeches):
 
 
 def create_table_files_directory(directory, extension):
+    #récupère le nom des fichiers txt d'un répertoire
     files_names = []
     for filename in os.listdir(directory):
         if filename.endswith(extension):
@@ -32,6 +36,7 @@ def create_table_files_directory(directory, extension):
 
 
 def recover_string_file(directory, file):
+    #récupére le string d'un file
     file_path = os.path.join(directory, file)
     with open(file_path, 'r') as file:
         content = file.read()
@@ -56,6 +61,7 @@ def remove_accents(texte):
 
 
 def table_is_nul(table):
+    #vérifie si un tableau est nul renvoie true or false
     return all(element == 0.0 for element in table)
 
 
@@ -77,6 +83,7 @@ def dict_names(name_file):
 
 # 4 - Similarity Calculation
 def dot_product(vector1, vector2):
+    #produit scalaire
     if len(vector1) != len(vector2):
         return "Les vecteurs ne sont pas de la même longueur, on ne peut pas calculer le produit scalaire."
     summation = 0
@@ -86,6 +93,7 @@ def dot_product(vector1, vector2):
 
 
 def vector_norm(vector):
+    #calcul la norme du vecteur
     summation = 0
     for i in range(len(vector)):
         summation += (vector[i]) ** 2

@@ -14,8 +14,9 @@ def main(directory):
     print("4. Indiquer le(s) nom(s) du (des) président(s) qui a (ont) parlé de la « Nation » et celui qui l’a répété "
           "le plus defois")
     print("5. Indiquer le(s) nom(s) du (des) président(s) qui a (ont) parlé du climat et/ou de l’écologie")
+    print("6. Chatbot")
     print("0. Quitter")
-    choice = input("Choisissez une option (0-5): ")
+    choice = input("Choisissez une option (0-6): ")
 
     if choice == "1":
         result = display_world_less_important(repertory)
@@ -34,15 +35,24 @@ def main(directory):
 
     elif choice == "5":
         climate(repertory)
+    elif choice == "6":
+        question = input("  Veuillez entrer votre question")
+        display_answer(question, repertory, directory)
     elif choice == "0":
         print("Au revoir!")
     else:
-        print("Choix invalide. Veuillez choisir une option de 0 à 6.")
+        print("Choix invalide. Veuillez choisir une option de 0 à 7.")
 
 
-def display_world_less_important(direcotry):
+def display_world_less_important(directory):
+    """
+    Affiche les mots moins importants dans la matrice TF-IDF pour un répertoire donné.
+
+    :param directory: Répertoire des fichiers source
+    :return: Liste des mots moins importants
+    """
     world_less_important = []
-    dict_matrice = fn.calculate_tf_idf(direcotry)
+    dict_matrice = fn.calculate_tf_idf(directory)
     for key in dict_matrice.keys():
         value = dict_matrice[key]
         if utils.table_is_nul(value):
@@ -50,80 +60,115 @@ def display_world_less_important(direcotry):
     return world_less_important
 
 
-def dispay_worlds_more_tdidf(directory):
-    worlds_more_tdidf = []
+def display_worlds_more_tfidf(directory):
+    """
+    Affiche les mots ayant le plus grand score TF-IDF dans la matrice pour un répertoire donné.
+
+    :param directory: Répertoire des fichiers source
+    :return: Liste des mots avec le plus grand score TF-IDF
+    """
+    worlds_more_tfidf = []
     dict_matrice = fn.calculate_tf_idf(directory)
     value_max = max(dict_matrice.values())
     for key in dict_matrice.keys():
         if dict_matrice[key] == value_max:
-            worlds_more_tdidf.append(key)
-    return worlds_more_tdidf
+            worlds_more_tfidf.append(key)
+    return worlds_more_tfidf
 
 
-def worlds_most_repeated_chirac():
+def words_most_repeated_chirac():
+    """
+    Retourne la liste des mots les plus fréquents dans les fichiers "Nomination_Chirac1.txt" et "Nomination_Chirac2.txt"
+    après le nettoyage.
+
+    :return: Liste des mots les plus fréquents
+    """
     words_most_repeated_chirac = []
     content_file1_chirac = utils.recover_string_file("cleaned", "Nomination_Chirac1.txt")
     content_file2_chirac = utils.recover_string_file("cleaned", "Nomination_Chirac2.txt")
-    score_td_file1 = fn.TF(content_file1_chirac)
-    score_td_file2 = fn.TF(content_file2_chirac)
-    score_td_file1_without = {key: value for key, value in score_td_file1.items() if
-                              not utils.table_is_nul(fn.calculate_tf_idf("cleaned")[key])}
+    score_tf_file1 = fn.TF(content_file1_chirac)
+    score_tf_file2 = fn.TF(content_file2_chirac)
 
-    score_td_file2_without = {key: value for key, value in score_td_file2.items() if
-                              not utils.table_is_nul(fn.calculate_tf_idf("cleaned")[key])}
+    # Exclusion des mots avec un score TF-IDF nul
+    score_tf_file1_without_null_tfidf = {key: value for key, value in score_tf_file1.items() if
+                                         not utils.table_is_null(fn.calculate_tf_idf("cleaned")[key])}
 
-    value_max_file1 = max(score_td_file1_without.values())
-    value_max_file2 = max(score_td_file2_without.values())
+    score_tf_file2_without_null_tfidf = {key: value for key, value in score_tf_file2.items() if
+                                         not utils.table_is_null(fn.calculate_tf_idf("cleaned")[key])}
+
+    # Recherche des mots ayant le score TF le plus élevé
+    value_max_file1 = max(score_tf_file1_without_null_tfidf.values())
+    value_max_file2 = max(score_tf_file2_without_null_tfidf.values())
     value_max = max(value_max_file1, value_max_file2)
-    for key in score_td_file1:
-        if score_td_file1[key] == value_max:
+
+    # Ajout des mots ayant le score TF le plus élevé à la liste
+    for key in score_tf_file1:
+        if score_tf_file1[key] == value_max:
             words_most_repeated_chirac.append(key)
-    for key in score_td_file2:
-        if score_td_file2[key] == value_max:
+    for key in score_tf_file2:
+        if score_tf_file2[key] == value_max:
             words_most_repeated_chirac.append(key)
+
     return words_most_repeated_chirac
 
 
 def presidents_nation(directory):
+    """
+    Affiche le président qui a le plus souvent utilisé le mot "nation" et le nombre de fois où ce mot a été répété.
+
+    :param directory: Le répertoire contenant les fichiers texte des discours des présidents.
+    :return: Liste des présidents ayant utilisé le mot "nation".
+    """
     max_number = 1
-    world = "nation"
+    word = "nation"
     names_presidents = []
     content_files = fn.list_of_files(directory, ".txt")
     president_most_nation = {}
+
     for files in content_files:
         content = utils.recover_string_file(directory, files)
         tf = fn.TF(content)
-        if world in tf:
+
+        if word in tf:
             names_presidents.append(files)
-            number_nation = tf.get(world)
+            number_nation = tf.get(word)
+
             if number_nation > max_number:
                 max_number = number_nation
                 president_most_nation[max_number] = files
+
     name = president_most_nation[max(president_most_nation)]
     var = utils.dict_names(name)
     final_var = utils.remove_digits(var)
 
     print(
-        "Le président {0} a utilisé {1} fois le mot nation . Il sagit de celui qui l’a répété le plus de fois ".format(
+        "Le président {0} a utilisé le mot 'nation' {1} fois, ce qui en fait celui qui l’a répété le plus de fois.".format(
             final_var, max(president_most_nation)))
-    print("Le(s) président(s) qui a (ont) parlé de la « Nation »")
+
+    print("Le(s) président(s) qui a (ont) parlé de la « Nation »:")
     return fn.display_names(names_presidents)
 
 
 def climate(directory):
-    field_climate = ["climat", "ecologie", "nature", "environnement", "biodiversite", "pollution", "durabilite",
-                     "ressources", "developpement durable", "energie"]
+    """
+    Affiche le président qui a le plus souvent parlé du climat et/ou de l'écologie et les présidents qui ont abordé ces thèmes.
+
+    :param directory: Le répertoire contenant les fichiers texte des discours des présidents.
+    """
+    field_climate = ["climat", "écologie", "nature", "environnement", "biodiversité", "pollution", "durabilité",
+                     "ressources", "développement durable", "énergie"]
     content_files = fn.list_of_files(directory, ".txt")
     presidents_climate = []
 
     # Initialiser les variables pour stocker le président avec la fréquence maximale
     max_frequency = 0
+    most_talked_about_climate_president = None
 
     for files in content_files:
         # Récupérer le contenu du fichier
         content = utils.recover_string_file(directory, files)
-
         term_frequencies = fn.TF(content)
+
         total_frequency = 0
         for term in field_climate:
             if utils.dict_names(files) not in presidents_climate:
@@ -136,23 +181,33 @@ def climate(directory):
 
         if total_frequency > max_frequency:
             max_frequency = total_frequency
-            var = utils.dict_names(files)
+            most_talked_about_climate_president = utils.dict_names(files)
 
     # Afficher le président avec la fréquence maximale
-    print("Le  président qui à parler le plus du climat et/ou de l'écologie est :", var)
-    print("Les présidents qui ont parlé le plus du climat et/ou de l'écologie sont :")
-    print(presidents_climate)
+    print("Le président qui a parlé le plus du climat et/ou de l'écologie est :", most_talked_about_climate_president)
+    print("Les présidents qui ont parlé du climat et/ou de l'écologie sont :", presidents_climate)
 
 
 def display_answer(question, dossier, dossier_origine):
+    """
+    Affiche une réponse à la question en fonction de son format.
+
+    :param question: La question posée.
+    :param dossier: Le répertoire contenant les fichiers texte des discours des présidents.
+    :param dossier_origine: Le répertoire d'origine.
+    :return: La réponse générée.
+    """
     # Liste de propositions non exhaustives
     question_starters = {"Comment": "Après analyse, ",
                          "Pourquoi": "Car, ",
                          "Peux-tu": "Oui, bien sûr! "}
+
     reponse = fn.generate_response(question, dossier, dossier_origine)
     phrase_actuelle = ""
+
     for caractere in question:
         phrase_actuelle += caractere
         if phrase_actuelle in question_starters.keys():
             return question_starters[phrase_actuelle] + reponse
+
     return reponse

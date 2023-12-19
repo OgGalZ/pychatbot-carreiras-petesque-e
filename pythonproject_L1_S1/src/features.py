@@ -44,7 +44,7 @@ def main(directory):
     elif choice == "0":
         print("Au revoir!")
     else:
-        print("Choix invalide. Veuillez choisir une option de 0 à 7.")
+        print("Choix invalide. Veuillez choisir une option de 0 à 6.")
 
 
 def display_world_less_important(directory):
